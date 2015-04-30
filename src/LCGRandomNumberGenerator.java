@@ -26,7 +26,7 @@ public class LCGRandomNumberGenerator {
 	 * @return Normalized next uniform random number between min and max
 	 */
 	public double getNext(double min, double max) {
-		int q =  m / a;
+		int q = m / a;
 		int r = m % a;
 
 		if (r > q) {
@@ -48,8 +48,7 @@ public class LCGRandomNumberGenerator {
 		return normlize(currentX, min, max);
 	}
 
-	private double normlize(int currentX2, double min, double max) {
-		// TODO Auto-generated method stub
-		return 0;
+	private double normlize(int currentX, double min, double max) {
+		return (currentX - 0) * (max - min) / (m - 0) + min;		
 	}
 }
