@@ -13,7 +13,7 @@ public class LCGRandomNumberGenerator {
 	private int m = (int) (Math.pow(2, 32) - 1);
 
 	public LCGRandomNumberGenerator(int initialX, int a, int m) {
-		this.currentX = initialX;
+		this.currentX = 500;
 		this.a = a;
 		this.m = m;
 	}
@@ -44,7 +44,7 @@ public class LCGRandomNumberGenerator {
 			currentX = gx + m;
 		else
 			currentX = gx;
-
+		
 		return normlize(currentX, min, max);
 	}
 

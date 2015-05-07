@@ -103,13 +103,29 @@ public class Machine {
 				+ ", with breaking time " + breakingTime);
 	}
 
+	public void notifyBadItem() {
+		numberOfProcessedItems--;
+	}
+
+	int modCount = 0;
+	int queuCount = 0;
+
 	public void update() {
 		currentTime += timeInterval;
 		totalQueueLenghts += waitingQueue.size();
+		queuCount++;
+		if (queuCount % 10 == 0) {
+			MeanQueueLength.add(totalQueueLenghts * 1.0 / currentTime * 1.0);
+		}
 
-		MeanQueueLength.add(totalQueueLenghts * 1.0 / currentTime * 1.0);
-
-		if ((Math.floor(currentTime*100)/100) % 60.00== 0.0) {
+		if ((Math.floor(currentTime * 100) / 100) % 60.00 == 0.0) {
+			modCount++;
+			if (modCount == 9) {
+				hourlyThroput.clear();
+				MeanQueueLength.clear();
+				machineListner.onTransientPeriodFinished();
+				serviceTime = 0;
+			}
 			hourlyThroput.add(numberOfProcessedItems * 1.0 / 60);
 			numberOfProcessedItems = 0;
 		}
@@ -183,5 +199,7 @@ public class Machine {
 
 	public interface MachineListner {
 		public abstract void onItemProcessed(Item item);
+
+		public abstract void onTransientPeriodFinished();
 	}
 }

@@ -15,7 +15,7 @@ public class Simulator {
 		int itemId = 0;
 
 		double scaleInterval = 0.05;
-		long totalTime = 6000;
+		long totalTime = 75000;
 
 		final Random rn = new Random();
 		final int badFlag = 1;
@@ -32,6 +32,13 @@ public class Simulator {
 				item.setResponseTime(item.getResponseTime()
 						+ (item.getDepartureTime() - item.getArrivalTime()));
 			}
+
+			@Override
+			public void onTransientPeriodFinished() {
+				// TODO Auto-generated method stub
+				interArrivalTimes.clear();
+				processedItems.clear();
+			}
 		});
 
 		is.setMachineListner(new Machine.MachineListner() {
@@ -43,13 +50,22 @@ public class Simulator {
 				// number have 10% probability to occur.
 				int randomNumber = rn.nextInt(10) + 1;
 				System.out.println("Item " + item.getId() + " left IS.");
-				if (randomNumber == badFlag) {
-					mc.addToQueue(item);
-				} else {
-					// TODO report item is good
-				}
 				item.setResponseTime(item.getResponseTime()
 						+ (item.getDepartureTime() - item.getArrivalTime()));
+
+				if (randomNumber == badFlag) {
+					mc.addToQueue(item);
+					is.notifyBadItem();
+				} else {
+					// TODO report item is good
+					processedItems.add(item);
+				}
+			}
+
+			@Override
+			public void onTransientPeriodFinished() {
+				// TODO Auto-generated method stub
+
 			}
 		});
 
@@ -127,16 +143,16 @@ public class Simulator {
 		System.out.println("IS Service Time = " + is.getServiceTime());
 
 		pw = new PrintWriter("MachineCenterServiceTime.txt");
-		for (Item item : processedItems) {
-			pw.write("Item " + item.getId() + " =");
-			pw.write(item.getResponseTime() + "");
-		}
+		pw.write(mc.getServiceTime() + "");
+		pw.close();
+
+		pw = new PrintWriter("ISServiceTime.txt");
+		pw.write(is.getServiceTime() + "");
 		pw.close();
 
 		pw = new PrintWriter("itemResponseTime.txt");
 		for (Item item : processedItems) {
-			pw.write("Item " + item.getId() + " =");
-			pw.write(item.getResponseTime() + "");
+			pw.write(item.getResponseTime() + ",\n");
 		}
 		pw.close();
 
@@ -151,7 +167,7 @@ public class Simulator {
 			pw.write(double1 + ",\n");
 		}
 		pw.close();
-		
+
 		pw = new PrintWriter("MachineCenterHourlyThrouput.txt");
 		for (Double double1 : mc.getHourlyThrouput()) {
 			pw.write(double1 + ",\n");
